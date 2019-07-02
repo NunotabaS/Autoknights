@@ -20,6 +20,14 @@ class Tile:
             return 'T'
         elif self.type == 'tile_flystart':
             return '%'
+        elif self.type == 'tile_floor':
+            return '.'
+        elif self.type == 'tile_rcm_crate':
+            return ':'
+        elif self.type == 'tile_fence':
+            return '`'
+        elif self.type == 'tile_hole':
+            return 'v'
         else:
             return '?'
 
@@ -72,15 +80,23 @@ class OverlayMap:
         for pos in self.map.itercoords():
             if not self.is_empty(pos):
                 yield (pos, self.placements[pos])
+    
+    def __repr__(self):
+        return '{}'.format(self.map)
 
 class Level:
-    def __init__(self, map, enemies, routes):
+    def __init__(self, map, enemies = [], routes = [], waves = []):
         self.layable_map = OverlayMap(map)
         self.enemies = enemies
         self.routes = routes
+        self.waves = waves
     
-    def execute_strategy():
+    def execute_strategy(self, strategy):
         pass
+    
+    def __repr__(self):
+        return 'Map:\n{map}\n\nCost:'.format(
+            map=self.layable_map)
 
 def _build_map(map_data):
     # Build the tiles
@@ -104,9 +120,7 @@ def load_level_from_json(filename):
     with open(filename, 'r') as f:
         level_data = json.load(f)
         map = _build_map(level_data['mapData'])
-        print(map)
-        # Build the tiles
-        
+        return Level(map)
 
 if __name__ == '__main__':
     # Try to load a level
@@ -122,5 +136,8 @@ if __name__ == '__main__':
     
     if os.path.isfile(args.data):
         level = load_level_from_json(args.data)
-        repr(level)
+        print(level)
+    else:
+        print('File {} not found!'.format(args.data))
+        exit(1)
     
